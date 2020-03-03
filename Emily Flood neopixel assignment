@@ -1,0 +1,65 @@
+/*Emily Flood
+  March 3, 2020
+  Neopixel assignment
+  This code uses a pixel strip and a button. When the button is pressed,
+  each LED on the pixel strip flashes a different colour.
+  When it is not pressed, it blinks pink and yellow.
+  This program uses some code from the "strandtest" example.
+*/
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+// the strip is connected to pin 6
+#define LED_PIN    6
+
+// 8 LEDS are attached to the pixel strip
+#define LED_COUNT 8
+
+// Declaring NeoPixel strip object:
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// setup() function -- runs once at startup --------------------------------
+
+void setup() {
+  // supports the Adafruit Trinket 5V 16 MHz.
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+  // END of Trinket-specific code.
+
+  //defines where the button is connected
+  pinMode(8, INPUT);
+
+  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+}
+
+void loop() {
+  if (digitalRead(8) == HIGH) {//when the button is pressed, the pixel strip will show different colours.
+    strip.setPixelColor(0, 255, 255, 0);
+    strip.setPixelColor(1, 255, 0, 255);
+    strip.setPixelColor(2, 0, 255, 255);
+    strip.setPixelColor(3, 255, 100, 0);
+    strip.setPixelColor(4, 0, 255, 0);
+    strip.setPixelColor(5, 0, 0, 255);
+    strip.setPixelColor(6, 255, 100, 255);
+    strip.setPixelColor(7, 255, 0, 0);
+    strip.show();
+  } else { //when the button is not pressed,, it will alternate Pink and Yellow.
+    colorWipe(strip.Color(  255, 0,  100 ), 50); // Pink
+    colorWipe(strip.Color( 255, 100, 0 ), 50); //Yellow
+  }
+}
+
+//alternates colours on the pixel strip
+void colorWipe(uint32_t color, int wait) {
+  for (int i = 0; i < strip.numPixels(); i++) { // For each pixel in strip...
+    strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
+    strip.show();                          //  Update strip to match
+    delay(wait);                           //  Pause for a moment
+  }
+}
